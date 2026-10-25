@@ -1,0 +1,1321 @@
+<meta charset="utf-8">
+<title>Beirut Board Audience Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>.maplibregl-map {
+    font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    position: relative;
+    -webkit-tap-highlight-color: rgb(0 0 0 / 0%);
+}
+
+.maplibregl-canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.maplibregl-map:fullscreen {
+    width: 100%;
+    height: 100%;
+}
+
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass {
+    touch-action: none;
+}
+
+.maplibregl-canvas-container.maplibregl-interactive,
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass {
+    cursor: grab;
+    user-select: none;
+}
+
+.maplibregl-canvas-container.maplibregl-interactive.maplibregl-track-pointer {
+    cursor: pointer;
+}
+
+.maplibregl-canvas-container.maplibregl-interactive:active,
+.maplibregl-ctrl-group button.maplibregl-ctrl-compass:active {
+    cursor: grabbing;
+}
+
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate,
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate .maplibregl-canvas {
+    touch-action: pan-x pan-y;
+}
+
+.maplibregl-canvas-container.maplibregl-touch-drag-pan,
+.maplibregl-canvas-container.maplibregl-touch-drag-pan .maplibregl-canvas {
+    touch-action: pinch-zoom;
+}
+
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan,
+.maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan .maplibregl-canvas {
+    touch-action: none;
+}
+
+.maplibregl-canvas-container.maplibregl-touch-drag-pan.maplibregl-cooperative-gestures,
+.maplibregl-canvas-container.maplibregl-touch-drag-pan.maplibregl-cooperative-gestures .maplibregl-canvas {
+    touch-action: pan-x pan-y;
+}
+
+.maplibregl-ctrl-top-left,
+.maplibregl-ctrl-top-right,
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-bottom-right {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.maplibregl-ctrl-top-left {
+    top: 0;
+    left: 0;
+}
+
+.maplibregl-ctrl-top-right {
+     top: 0;
+     right: 0;
+    }
+
+.maplibregl-ctrl-bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+.maplibregl-ctrl-bottom-right {
+     right: 0;
+     bottom: 0;
+}
+
+.maplibregl-ctrl {
+    clear: both;
+    pointer-events: auto;
+
+    /* workaround for a Safari bug https://github.com/mapbox/mapbox-gl-js/issues/8185 */
+    transform: translate(0, 0);
+}
+
+.maplibregl-ctrl-top-left .maplibregl-ctrl {
+    margin: 10px 0 0 10px;
+     float: left;
+}
+
+.maplibregl-ctrl-top-right .maplibregl-ctrl {
+    margin: 10px 10px 0 0;
+    float: right;
+}
+
+.maplibregl-ctrl-bottom-left .maplibregl-ctrl {
+    margin: 0 0 10px 10px;
+    float: left;
+}
+
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl {
+    margin: 0 10px 10px 0;
+    float: right;
+}
+
+.maplibregl-ctrl-group {
+    border-radius: 4px;
+    background: #fff;
+}
+
+.maplibregl-ctrl-group:not(:empty) {
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+}
+
+@media (forced-colors: active) {
+    .maplibregl-ctrl-group:not(:empty) {
+        box-shadow: 0 0 0 2px ButtonText;
+    }
+}
+
+.maplibregl-ctrl-group button {
+    width: 29px;
+    height: 29px;
+    display: block;
+    padding: 0;
+    outline: none;
+    border: 0;
+    box-sizing: border-box;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.maplibregl-ctrl-group button + button {
+    border-top: 1px solid #ddd;
+}
+
+.maplibregl-ctrl button .maplibregl-ctrl-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+@media (forced-colors: active) {
+    .maplibregl-ctrl-icon {
+        background-color: transparent;
+    }
+
+    .maplibregl-ctrl-group button + button {
+        border-top: 1px solid ButtonText;
+    }
+}
+
+/* https://bugzilla.mozilla.org/show_bug.cgi?id=140562 */
+.maplibregl-ctrl button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+.maplibregl-ctrl-attrib-button:focus,
+.maplibregl-ctrl-group button:focus {
+    box-shadow: 0 0 2px 2px rgb(0 150 255 / 100%);
+}
+
+.maplibregl-ctrl button:disabled {
+    cursor: not-allowed;
+}
+
+.maplibregl-ctrl button:disabled .maplibregl-ctrl-icon {
+    opacity: 0.25;
+}
+
+.maplibregl-ctrl button:not(:disabled):hover {
+    background-color: rgb(0 0 0 / 5%);
+}
+
+.maplibregl-ctrl-group button:focus:focus-visible {
+    box-shadow: 0 0 2px 2px rgb(0 150 255 / 100%);
+}
+
+.maplibregl-ctrl-group button:focus:not(:focus-visible) {
+    box-shadow: none;
+}
+
+.maplibregl-ctrl-group button:focus:first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.maplibregl-ctrl-group button:focus:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
+.maplibregl-ctrl-group button:focus:only-child {
+    border-radius: inherit;
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+    background-image: svg-load("svg/maplibregl-ctrl-zoom-out.svg", fill: #333);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+    background-image: svg-load("svg/maplibregl-ctrl-zoom-in.svg", fill: #333);
+}
+
+@media (forced-colors: active) {
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-zoom-out.svg", fill: #fff);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-zoom-in.svg", fill: #fff);
+    }
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: light) {
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-zoom-out.svg", fill: #000);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-zoom-in.svg", fill: #000);
+    }
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon {
+    background-image: svg-load("svg/maplibregl-ctrl-fullscreen.svg", fill: #333);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon {
+    background-image: svg-load("svg/maplibregl-ctrl-shrink.svg");
+}
+
+@media (forced-colors: active) {
+    .maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-fullscreen.svg", fill: #fff);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-shrink.svg", fill: #fff);
+    }
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: light) {
+    .maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-fullscreen.svg", fill: #000);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-shrink.svg", fill: #000);
+    }
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon {
+    background-image: svg-load("svg/maplibregl-ctrl-compass.svg", fill: #333);
+}
+
+@media (forced-colors: active) {
+    .maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon {
+        @svg-load ctrl-compass-white url("svg/maplibregl-ctrl-compass.svg") {
+            fill: #fff;
+            #south { fill: #999; }
+        }
+
+        background-image: svg-inline(ctrl-compass-white);
+    }
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: light) {
+    .maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon {
+        background-image: svg-load("svg/maplibregl-ctrl-compass.svg", fill: #000);
+    }
+}
+
+@svg-load ctrl-terrain url("svg/maplibregl-ctrl-terrain.svg") {
+    fill: #333;
+    #stroke { display: none; }
+}
+
+@svg-load ctrl-terrain-enabled url("svg/maplibregl-ctrl-terrain.svg") {
+    fill: #33b5e5;
+    #stroke { display: none; }
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-terrain .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-terrain);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-terrain-enabled .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-terrain-enabled);
+}
+
+@svg-load ctrl-geolocate url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #333;
+    #stroke { display: none; }
+}
+
+@svg-load ctrl-geolocate-white url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #fff;
+    #stroke { display: none; }
+}
+
+@svg-load ctrl-geolocate-black url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #000;
+    #stroke { display: none; }
+}
+
+@svg-load ctrl-geolocate-disabled url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #aaa;
+    #stroke { fill: #f00; }
+}
+
+@svg-load ctrl-geolocate-disabled-white url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #999;
+    #stroke { fill: #f00; }
+}
+
+@svg-load ctrl-geolocate-disabled-black url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #666;
+    #stroke { fill: #f00; }
+}
+
+@svg-load ctrl-geolocate-active url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #33b5e5;
+    #stroke { display: none; }
+}
+
+@svg-load ctrl-geolocate-active-error url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #e58978;
+    #stroke { display: none; }
+}
+
+@svg-load ctrl-geolocate-background url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #33b5e5;
+    #stroke { display: none; }
+    #dot { display: none; }
+}
+
+@svg-load ctrl-geolocate-background-error url("svg/maplibregl-ctrl-geolocate.svg") {
+    fill: #e54e33;
+    #stroke { display: none; }
+    #dot { display: none; }
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-geolocate);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-geolocate-disabled);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-geolocate-active);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active-error .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-geolocate-active-error);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-geolocate-background);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background-error .maplibregl-ctrl-icon {
+    background-image: svg-inline(ctrl-geolocate-background-error);
+}
+
+.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-waiting .maplibregl-ctrl-icon {
+    animation: maplibregl-spin 2s infinite linear;
+}
+
+@media (forced-colors: active) {
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-white);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-disabled-white);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-active);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active-error .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-active-error);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-background);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background-error .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-background-error);
+    }
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: light) {
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-black);
+    }
+
+    .maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon {
+        background-image: svg-inline(ctrl-geolocate-disabled-black);
+    }
+}
+
+@keyframes maplibregl-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+a.maplibregl-ctrl-logo {
+    width: 88px;
+    height: 23px;
+    margin: 0 0 -4px -4px;
+    display: block;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    overflow: hidden;
+    background-image: svg-load("svg/maplibregl-ctrl-logo.svg");
+}
+
+a.maplibregl-ctrl-logo.maplibregl-compact {
+    width: 14px;
+}
+
+@media (forced-colors: active) {
+    a.maplibregl-ctrl-logo {
+        @svg-load ctrl-logo-white url("svg/maplibregl-ctrl-logo.svg") {
+            #outline { opacity: 1; }
+            #fill { opacity: 1; }
+        }
+
+        background-color: transparent;
+        background-image: svg-inline(ctrl-logo-white);
+    }
+}
+
+@media (forced-colors: active) and (prefers-color-scheme: light) {
+    a.maplibregl-ctrl-logo {
+        @svg-load ctrl-logo-black url("svg/maplibregl-ctrl-logo.svg") {
+            #outline { opacity: 1; fill: #fff; stroke: #fff; }
+            #fill { opacity: 1; fill: #000; }
+        }
+
+        background-image: svg-inline(ctrl-logo-black);
+    }
+}
+
+.maplibregl-ctrl.maplibregl-ctrl-attrib {
+    padding: 0 5px;
+    background-color: rgb(255 255 255 / 50%);
+    margin: 0;
+}
+
+@media screen {
+    .maplibregl-ctrl-attrib.maplibregl-compact {
+        min-height: 20px;
+        padding: 2px 24px 2px 0;
+        margin: 10px;
+        position: relative;
+        background-color: #fff;
+        color: #000;
+        border-radius: 12px;
+        box-sizing: content-box;
+    }
+
+    .maplibregl-ctrl-attrib.maplibregl-compact-show {
+        padding: 2px 28px 2px 8px;
+        visibility: visible;
+    }
+
+    .maplibregl-ctrl-top-left > .maplibregl-ctrl-attrib.maplibregl-compact-show,
+    .maplibregl-ctrl-bottom-left > .maplibregl-ctrl-attrib.maplibregl-compact-show {
+        padding: 2px 8px 2px 28px;
+        border-radius: 12px;
+    }
+
+    .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-inner {
+        display: none;
+    }
+
+    .maplibregl-ctrl-attrib-button {
+        display: none;
+        cursor: pointer;
+        position: absolute;
+        background-image: svg-load("svg/maplibregl-ctrl-attrib.svg");
+        background-color: rgb(255 255 255 / 50%);
+        width: 24px;
+        height: 24px;
+        box-sizing: border-box;
+        border-radius: 12px;
+        outline: none;
+        top: 0;
+        right: 0;
+        border: 0;
+    }
+
+    .maplibregl-ctrl-attrib summary.maplibregl-ctrl-attrib-button {
+        appearance: none;
+        list-style: none;
+    }
+
+    .maplibregl-ctrl-attrib summary.maplibregl-ctrl-attrib-button::-webkit-details-marker {
+        display: none;
+    }
+
+    .maplibregl-ctrl-top-left .maplibregl-ctrl-attrib-button,
+    .maplibregl-ctrl-bottom-left .maplibregl-ctrl-attrib-button {
+        left: 0;
+    }
+
+    .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button,
+    .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner {
+        display: block;
+    }
+
+    .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-button {
+        background-color: rgb(0 0 0 / 5%);
+    }
+
+    .maplibregl-ctrl-bottom-right > .maplibregl-ctrl-attrib.maplibregl-compact::after {
+        bottom: 0;
+        right: 0;
+    }
+
+    .maplibregl-ctrl-top-right > .maplibregl-ctrl-attrib.maplibregl-compact::after {
+        top: 0;
+        right: 0;
+    }
+
+    .maplibregl-ctrl-top-left > .maplibregl-ctrl-attrib.maplibregl-compact::after {
+        top: 0;
+        left: 0;
+    }
+
+    .maplibregl-ctrl-bottom-left > .maplibregl-ctrl-attrib.maplibregl-compact::after {
+        bottom: 0;
+        left: 0;
+    }
+}
+
+@media screen and (forced-colors: active) {
+    .maplibregl-ctrl-attrib.maplibregl-compact::after {
+        background-image: svg-load("svg/maplibregl-ctrl-attrib.svg", fill=#fff);
+    }
+}
+
+@media screen and (forced-colors: active) and (prefers-color-scheme: light) {
+    .maplibregl-ctrl-attrib.maplibregl-compact::after {
+        background-image: svg-load("svg/maplibregl-ctrl-attrib.svg");
+    }
+}
+
+.maplibregl-ctrl-attrib a {
+    color: rgb(0 0 0 / 75%);
+    text-decoration: none;
+}
+
+.maplibregl-ctrl-attrib a:hover {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.maplibregl-attrib-empty {
+    display: none;
+}
+
+.maplibregl-ctrl-scale {
+    background-color: rgb(255 255 255 / 75%);
+    font-size: 10px;
+    border-width: medium 2px 2px;
+    border-style: none solid solid;
+    border-color: #333;
+    padding: 0 5px;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.maplibregl-popup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    will-change: transform;
+    pointer-events: none;
+}
+
+.maplibregl-popup-anchor-top,
+.maplibregl-popup-anchor-top-left,
+.maplibregl-popup-anchor-top-right {
+    flex-direction: column;
+}
+
+.maplibregl-popup-anchor-bottom,
+.maplibregl-popup-anchor-bottom-left,
+.maplibregl-popup-anchor-bottom-right {
+    flex-direction: column-reverse;
+}
+
+.maplibregl-popup-anchor-left {
+    flex-direction: row;
+}
+
+.maplibregl-popup-anchor-right {
+    flex-direction: row-reverse;
+}
+
+.maplibregl-popup-tip {
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    z-index: 1;
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    align-self: center;
+    border-top: none;
+    border-bottom-color: #fff;
+}
+
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip {
+    align-self: flex-start;
+    border-top: none;
+    border-left: none;
+    border-bottom-color: #fff;
+}
+
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+    align-self: flex-end;
+    border-top: none;
+    border-right: none;
+    border-bottom-color: #fff;
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    align-self: center;
+    border-bottom: none;
+    border-top-color: #fff;
+}
+
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip {
+    align-self: flex-start;
+    border-bottom: none;
+    border-left: none;
+    border-top-color: #fff;
+}
+
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+    align-self: flex-end;
+    border-bottom: none;
+    border-right: none;
+    border-top-color: #fff;
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    align-self: center;
+    border-left: none;
+    border-right-color: #fff;
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    align-self: center;
+    border-right: none;
+    border-left-color: #fff;
+}
+
+.maplibregl-popup-close-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: 0;
+    border-radius: 0 3px 0 0;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.maplibregl-popup-close-button:hover {
+    background-color: rgb(0 0 0 / 5%);
+}
+
+.maplibregl-popup-content {
+    position: relative;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+    padding: 15px 10px;
+    pointer-events: auto;
+}
+
+.maplibregl-popup-anchor-top-left .maplibregl-popup-content {
+    border-top-left-radius: 0;
+}
+
+.maplibregl-popup-anchor-top-right .maplibregl-popup-content {
+    border-top-right-radius: 0;
+}
+
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-content {
+    border-bottom-left-radius: 0;
+}
+
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-content {
+    border-bottom-right-radius: 0;
+}
+
+.maplibregl-popup-track-pointer {
+    display: none;
+}
+
+.maplibregl-popup-track-pointer * {
+    pointer-events: none;
+    user-select: none;
+}
+
+.maplibregl-map:hover .maplibregl-popup-track-pointer {
+    display: flex;
+}
+
+.maplibregl-map:active .maplibregl-popup-track-pointer {
+    display: none;
+}
+
+.maplibregl-marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+    transition: opacity 0.2s;
+}
+
+.maplibregl-user-location-dot {
+    background-color: #1da1f2;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.maplibregl-user-location-dot::before {
+    background-color: #1da1f2;
+    content: "";
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    position: absolute;
+    animation: maplibregl-user-location-dot-pulse 2s infinite;
+}
+
+.maplibregl-user-location-dot::after {
+    border-radius: 50%;
+    border: 2px solid #fff;
+    content: "";
+    height: 19px;
+    left: -2px;
+    position: absolute;
+    top: -2px;
+    width: 19px;
+    box-sizing: border-box;
+    box-shadow: 0 0 3px rgb(0 0 0 / 35%);
+}
+
+@keyframes maplibregl-user-location-dot-pulse {
+    0%   { transform: scale(1); opacity: 1; }
+    70%  { transform: scale(3); opacity: 0; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+.maplibregl-user-location-dot-stale {
+    background-color: #aaa;
+}
+
+.maplibregl-user-location-dot-stale::after {
+    display: none;
+}
+
+.maplibregl-user-location-accuracy-circle {
+    background-color: #1da1f233;
+    width: 1px;
+    height: 1px;
+    border-radius: 100%;
+}
+
+.maplibregl-crosshair,
+.maplibregl-crosshair .maplibregl-interactive,
+.maplibregl-crosshair .maplibregl-interactive:active {
+    cursor: crosshair;
+}
+
+.maplibregl-boxzoom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    background: #fff;
+    border: 2px dotted #202020;
+    opacity: 0.5;
+}
+
+.maplibregl-cooperative-gesture-screen {
+    background: rgba(0 0 0 / 40%);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 1rem;
+    font-size: 1.4em;
+    line-height: 1.2;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease 1s;
+    z-index: 99999;
+}
+
+.maplibregl-cooperative-gesture-screen.maplibregl-show {
+    opacity: 1;
+    transition: opacity 0.05s;
+}
+
+.maplibregl-cooperative-gesture-screen .maplibregl-mobile-message {
+    display: none;
+}
+
+@media (hover: none), (width <= 480px) {
+    .maplibregl-cooperative-gesture-screen .maplibregl-desktop-message {
+        display: none;
+    }
+
+    .maplibregl-cooperative-gesture-screen .maplibregl-mobile-message {
+        display: block;
+    }
+}
+
+.maplibregl-pseudo-fullscreen {
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 99999;
+}
+</style>
+<style>
+:root {
+  --paper: #ffffff; --surface: #ffffff; --ink: #1d1d1f; --ink2: #515154; --ink3: #6e6e73; --line: #e8e8ed; --fill: #f2f2f7;
+  --accent: #0071e3; --cedar: var(--accent); --red: #e3342f; --land: #f7f9fc; --sea: #d6e6f7; --bld: #e9edf3; --bld3: #d7dee8; --road: #ffffff; --roadc: #e1e6ee;
+  --t0: #cfe2fb; --t1: #0a4fb8; --nodata: #d2d6dc;
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --glass: rgba(255,255,255,.9); --glass-edge: rgba(0,0,0,.06); --shadow: 0 8px 30px rgba(15,30,60,.10), 0 1px 2px rgba(15,30,60,.06);
+  --thumb: #ffffff; --track: #f2f2f7; color-scheme: light;
+}
+@media (prefers-contrast: more) { :root { --ink3: var(--ink2); --line: var(--ink3); } }
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--paper); color: var(--ink); font: 14px/1.45 var(--body); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.app { position: relative; height: 100%; }
+body { -webkit-font-smoothing: antialiased; }
+.mapwrap { position: absolute; inset: 0; }
+#map { position: absolute; inset: 0; background: var(--land); }
+.card, .col { position: absolute; z-index: 5; top: 10px; bottom: 10px; background: var(--glass); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-edge); border-radius: 18px; box-shadow: var(--shadow); overflow: auto; min-width: 0; }
+.col { bottom: auto; max-height: calc(100% - 20px); right: max(10px, env(safe-area-inset-right, 0px)); width: 372px; }
+
+/* control card */
+.card { bottom: auto; max-height: calc(100% - 20px); left: max(10px, env(safe-area-inset-left, 0px)); width: 272px; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+.card h1 { font: 700 22px/1.1 var(--display); letter-spacing: -.022em; margin: 0; }
+.maplibregl-ctrl-bottom-right { right: 392px; } .maplibregl-ctrl-bottom-left { left: 292px; }
+@media (prefers-reduced-transparency: reduce) { .card, .col { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+@media (prefers-contrast: more) { .card, .col { background: var(--surface); backdrop-filter: none; border-color: var(--ink3); } }
+button:active { transform: scale(.97); transition: transform .1s ease-out; }
+.card .l { display: block; font-size: 12px; font-weight: 600; color: var(--ink2); margin-bottom: 6px; }
+.search { position: relative; }
+.search input { width: 100%; height: 34px; border: 0; border-radius: 10px; padding: 0 12px; background: var(--track); }
+.sugg { position: absolute; left: 0; right: 0; top: 36px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; list-style: none; margin: 0; padding: 4px 0; max-height: 220px; overflow: auto; z-index: 6; }
+.sugg button { width: 100%; text-align: left; border: 0; background: none; padding: 6px 10px; font-size: 13px; }
+.sugg button:hover, .sugg button:focus-visible { background: var(--fill); }
+.sugg small { color: var(--ink3); margin-left: 6px; }
+.seg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; padding: 2px; background: var(--track); border-radius: 9px; }
+.seg button { border: 0; background: transparent; height: 30px; font-size: 13px; font-weight: 500; border-radius: 7px; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; font-weight: 600; }
+.bands { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+.bands { gap: 2px !important; padding: 2px; background: var(--track); border-radius: 9px; }
+.bands button { border: 0; background: transparent; border-radius: 7px; height: 30px; font-size: 13px; color: var(--ink2); }
+.bands button[aria-pressed="true"] { background: var(--accent); color: #fff; font-weight: 600; }
+.hour { display: grid; grid-template-columns: 32px 1fr 44px; align-items: center; gap: 8px; }
+.hour button { width: 32px; height: 32px; border: 0; border-radius: 50%; background: var(--track); }
+.hour input { width: 100%; accent-color: var(--accent); }
+.hour output { font: 600 15px var(--display); text-align: right; font-variant-numeric: tabular-nums; }
+.key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 11px; color: var(--ink2); }
+.key .ramp { flex-basis: 100%; order: -1; }
+.key .ramp { flex: 1; height: 6px; border-radius: 3px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tog { border: 0; background: var(--track); border-radius: 999px; height: 28px; padding: 0 12px; font-size: 12px; font-weight: 600; }
+.tog[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.hint { font-size: 12px; color: var(--ink3); margin: 0; }
+
+/* panel */
+.pane { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.pane > * { min-width: 0; }
+.h { font: 600 15px/1.25 var(--display); letter-spacing: -.01em; margin: 0; }
+.muted { color: var(--ink3); font-size: 12px; margin: 0; }
+.prompt { font: 700 20px/1.2 var(--display); letter-spacing: -.02em; margin: 0; }
+ol.top { list-style: none; margin: 0; padding: 0; }
+ol.top li + li { border-top: .5px solid var(--line); }
+ol.top button { width: 100%; border: 0; background: none; display: grid; grid-template-columns: minmax(0,1fr) minmax(40px,110px); gap: 10px; align-items: center; padding: 8px 0; text-align: left; }
+ol.top button > span:first-child { min-width: 0; }
+ol.top .nm { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ol.top .dir { color: var(--ink3); font-size: 12px; }
+ol.top .bar { height: 6px; background: var(--fill); border-radius: 3px; overflow: hidden; }
+ol.top .bar i { display: block; height: 100%; background: var(--cedar); }
+ol.top .v { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--cedar); }
+.back { border: 0; background: none; padding: 0; color: var(--ink2); font-size: 13px; align-self: flex-start; }
+.title { font: 700 24px/1.1 var(--display); letter-spacing: -.024em; margin: 0; }
+.sub { color: var(--ink2); margin: 4px 0 0; }
+.ctrl { display: flex; gap: 6px; flex-wrap: wrap; }
+.ctrl button { border: 0; background: var(--track); border-radius: 8px; height: 32px; padding: 0 12px; font-size: 13px; font-weight: 500; }
+.big3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.big3 div { background: var(--fill); border-radius: 12px; padding: 10px; }
+.big3 b { display: block; font: 700 22px/1.1 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.big3 span { font-size: 12px; color: var(--ink3); }
+.big3 div.tr { border-top-color: var(--cedar); } .big3 div.tr b { color: var(--cedar); }
+svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-size: 12px; font-weight: 600; color: var(--ink2); padding: 5px 3px; border-bottom: 1px solid var(--line); }
+td { padding: 7px 3px; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+details.about summary { cursor: pointer; font-weight: 600; font-size: 13px; }
+details.about ol { margin: 8px 0 0; padding-left: 18px; color: var(--ink2); font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+.skel { height: 30px; background: var(--fill); border-radius: 4px; }
+.empty { color: var(--ink2); display: flex; flex-direction: column; gap: 8px; }
+.empty button { align-self: flex-start; border: 0; background: none; padding: 0; color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.lbl { font: 600 11px/1 var(--body); color: var(--ink2); letter-spacing: .02em; text-shadow: 0 0 3px var(--land), 0 0 3px var(--land), 0 0 3px var(--land); pointer-events: none; white-space: nowrap; }
+.maplibregl-popup-content { background: var(--glass); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); color: var(--ink); border: 1px solid var(--glass-edge); border-radius: 10px; box-shadow: var(--shadow); padding: 8px 11px; font: 12px/1.4 var(--body); }
+.maplibregl-popup-tip { display: none; }
+.maplibregl-ctrl-group { background: var(--glass) !important; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 1px solid var(--glass-edge); box-shadow: var(--shadow) !important; border-radius: 10px !important; overflow: hidden; }
+.maplibregl-ctrl-group button + button { border-top: 1px solid var(--line) !important; }
+.maplibregl-ctrl-icon { filter: none; }
+.maplibregl-ctrl-scale { background: var(--surface); color: var(--ink2); border-color: var(--ink2); }
+.maplibregl-ctrl-attrib { background: transparent !important; font-size: 10px; }
+.maplibregl-ctrl-attrib a, .maplibregl-ctrl-attrib-inner { color: var(--ink3) !important; }
+#key { justify-content: space-between; }
+#key .ramp { flex: 0 0 100%; order: -1; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 1000px) {
+  .app { height: auto; display: flex; flex-direction: column; }
+  .card, .col { position: static; width: auto; border-radius: 0; box-shadow: none; border: 0; background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; overflow: visible; }
+  .card { order: 1; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); }
+  .card .hint { margin-top: 0 !important; }
+  .mapwrap { order: 2; position: relative; height: 70vh; }
+  .col { order: 3; border-top: 1px solid var(--line); }
+  .maplibregl-ctrl-bottom-right { right: 0; } .maplibregl-ctrl-bottom-left { left: 0; }
+  .pane { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+dialog.intro { border: 0; border-radius: 18px; padding: 24px; width: min(420px, calc(100% - 32px)); box-shadow: var(--shadow); color: var(--ink); background: var(--surface); }
+dialog.intro::backdrop { background: rgba(15,30,60,.25); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+dialog.intro h2 { font: 700 22px/1.15 var(--display); letter-spacing: -.02em; margin: 0 0 6px; }
+dialog.intro ol { margin: 14px 0 18px; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; color: var(--ink2); }
+dialog.intro ol b { color: var(--ink); }
+dialog.intro .go { border: 0; border-radius: 10px; background: var(--accent); color: #fff; font-weight: 600; height: 38px; width: 100%; }
+.help { border: 0; background: var(--track); border-radius: 50%; width: 28px; height: 28px; font-size: 13px; font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="app">
+  <aside class="card" aria-label="Map controls">
+      <div class="row" style="flex-wrap:wrap;row-gap:10px"><h1 style="white-space:nowrap">Beirut roads</h1><span class="row" style="gap:6px"><button type="button" class="help" id="help" aria-label="How it works">?</button><button type="button" class="tog" id="tsat" aria-pressed="false">Satellite</button><button type="button" class="tog" id="t3d" aria-pressed="true">3D</button></span></div>
+      <div class="search"><input id="q" type="search" placeholder="Search a road or area" aria-label="Search a road or area" autocomplete="off"><ul class="sugg" id="sugg" hidden></ul></div>
+      <div><span class="l" id="lay-l">Layer</span><div class="seg" role="group" aria-labelledby="lay-l">
+        <button type="button" data-m="traffic" aria-pressed="true">Traffic</button>
+        <button type="button" data-m="speed" aria-pressed="false">Speed</button>
+        <button type="button" data-m="people" aria-pressed="false">People</button>
+        <button type="button" data-m="places" aria-pressed="false">Places</button>
+      </div></div>
+      <div id="c-traffic"><span class="l">When</span><div class="bands" id="bands" role="group" aria-label="Times of day"></div></div>
+      <div id="c-speed" hidden><span class="l">Hour</span><div class="hour"><button type="button" id="play" aria-label="Play through the day">▶</button><input type="range" id="hr" min="6" max="23" value="8" aria-label="Hour of day"><output id="hr-v">8:00</output></div></div>
+      <div class="key" id="key"></div>
+    </aside>
+  <div class="mapwrap">
+    <div id="map" role="region" aria-label="Interactive map of Greater Beirut. Click a road to place a board."></div>
+  </div>
+  <section class="col" aria-label="Board evidence"><div class="pane" id="pane"><div class="skel"></div><div class="skel"></div></div></section>
+</div>
+<div class="sr" role="status" aria-live="polite" id="live"></div>
+<dialog class="intro" id="intro" aria-labelledby="intro-h">
+  <h2 id="intro-h">How it works</h2>
+  <p class="muted">A small test interface for ranking billboard locations in Greater Beirut.</p>
+  <ol>
+    <li><b>Pick a layer:</b> Traffic, Speed, People or Places.</li>
+    <li><b>Click any road</b> to place a test board there, facing that direction.</li>
+    <li><b>Read the panel:</b> the board is ranked against other roads for traffic, time in view and people nearby.</li>
+    <li><b>Explore</b> in 3D or switch to Satellite to check the surroundings.</li>
+  </ol>
+  <p class="muted" style="margin:0 0 16px">Numbers are relative ranks, not audience counts.</p>
+  <form method="dialog"><button class="go">Start exploring</button></form>
+</dialog>
+
+
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const N = n => n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e4 ? Math.round(n / 1e3) + "k" : n >= 1e3 ? (n / 1e3).toFixed(1) + "k" : Math.round(n).toString();
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const say = t => { $("#live").textContent = ""; setTimeout(() => $("#live").textContent = t, 30); };
+const reduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const BANDS = [["Morning", "7–10", 3], ["Midday", "10–16", 6], ["Evening", "16–20", 4], ["Night", "20–24", 4]];
+const CAT = { office: "Offices", finance: "Banks", government: "Government", education: "Schools, universities", health: "Hospitals, clinics", retail: "Shops", food: "Restaurants, cafés", nightlife: "Bars, clubs", hospitality: "Hotels", auto: "Car trade", construction: "Construction", industrial: "Industry" };
+const COMPASS = ["north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west"];
+const compass = a => COMPASS[Math.round(((a % 360) + 360) % 360 / 45) % 8];
+let M, G, map, mask, KX, KY, board = null, timer = null, popup;
+const st = { mode: "traffic", bands: [0, 1, 2, 3], hour: 8, dist: 250, d3: true, sat: false };
+
+// ---------- geometry ----------
+const toXY = (lon, lat, o) => [(lon - o[0]) * KX, (lat - o[1]) * KY];
+const bearing = (dx, dy) => (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360;
+const angDiff = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
+function blocked(lon, lat) { const c = Math.floor((lon - mask.lon0) / mask.dlon), r = Math.floor((mask.lat1 - lat) / mask.dlat); if (c < 0 || r < 0 || c >= mask.w || r >= mask.h) return 0; return (mask.bits[r * mask.rowbytes + (c >> 3)] >> (7 - (c & 7))) & 1; }
+function sightClear(vlon, vlat, blon, blat, dist) { const n = Math.floor(dist / 4); for (let i = 1; i < n; i++) { const t = i / n; if (dist * (1 - t) < 12) break; if (blocked(vlon + (blon - vlon) * t, vlat + (blat - vlat) * t)) return false; } return true; }
+const dirsOf = r => ["yes", "true", "1"].includes(r.ow) ? [1] : r.ow === "-1" ? [-1] : [1, -1];
+function volume(rec) { if (!rec) return null; let s = 0; for (const b of st.bands) { if (rec.v[b] == null) return null; s += rec.v[b] * BANDS[b][2]; } return s; }
+let DK = "", DR = [], DD = [];
+function dists() { const k = st.bands.join(); if (k === DK) return; DK = k; DR = []; DD = [];
+  for (const r of M.roads) { let t = 0, ok = Object.keys(r.d).length > 0; for (const d of Object.values(r.d)) { const v = volume(d); if (v != null) DD.push(v); }
+    for (const b of st.bands) { const vs = Object.values(r.d).map(d => d.v[b]); if (vs.every(v => v == null)) { ok = false; break; } t += vs.filter(v => v != null).reduce((a, c) => a + c, 0) * BANDS[b][2]; } if (ok) DR.push(t); }
+  DR.sort((a, b) => a - b); DD.sort((a, b) => a - b); }
+function rankIn(a, x) { let lo = 0, hi = a.length; while (lo < hi) { const m = (lo + hi) >> 1; a[m] < x ? lo = m + 1 : hi = m; } return a.length ? Math.floor(100 * lo / a.length) : 0; }
+const pctRoad = x => (dists(), rankIn(DR, x)), pctDir = x => (dists(), rankIn(DD, x));
+function speed(rec) { if (!rec) return null; let s = 0, w = 0; for (const b of st.bands) if (rec.s[b] != null) { s += rec.s[b] * BANDS[b][2]; w += BANDS[b][2]; } return w ? s / w : rec.ff; }
+
+// ---------- board evaluation (measured traffic + geometry) ----------
+function evaluate(b) {
+  const o = [b.lon, b.lat], fn = b.face, D = st.dist, out = new Map(), pts = [];
+  for (const r of M.roads) {
+    const g = r.g; let near = false;
+    for (const p of g) { const [x, y] = toXY(p[0], p[1], o); if (x * x + y * y < (D + 200) ** 2) { near = true; break; } }
+    if (!near) continue;
+    for (let i = 0; i < g.length - 1; i++) {
+      const [x0, y0] = toXY(g[i][0], g[i][1], o), [x1, y1] = toXY(g[i + 1][0], g[i + 1][1], o), L = Math.hypot(x1 - x0, y1 - y0);
+      if (!L) continue; const n = Math.max(1, Math.floor(L / 10)), hd = bearing(x1 - x0, y1 - y0);
+      for (let j = 0; j < n; j++) {
+        const t = (j + .5) / n, x = x0 + t * (x1 - x0), y = y0 + t * (y1 - y0), d = Math.hypot(x, y);
+        if (d > D || d < 6 || angDiff(bearing(x, y), fn) > 80) continue;
+        const lon = g[i][0] + t * (g[i + 1][0] - g[i][0]), lat = g[i][1] + t * (g[i + 1][1] - g[i][1]), toBoard = bearing(-x, -y);
+        for (const dir of dirsOf(r)) {
+          const h = dir === 1 ? hd : (hd + 180) % 360; if (angDiff(h, toBoard) > 60) continue;
+          const clear = sightClear(lon, lat, b.lon, b.lat, d), k = r.id + ":" + dir;
+          if (!out.has(k)) out.set(k, { r, dir, h, clear: 0, block: 0 });
+          const a = out.get(k); clear ? a.clear += L / n : a.block += L / n; pts.push([lon, lat, clear ? 1 : 0]);
+        }
+      }
+    }
+  }
+  const ap = [...out.values()].filter(a => a.clear >= 20).map(a => { const rec = a.r.d[String(a.dir)], v = volume(rec), s = speed(rec);
+    return { name: a.r.nm || "Unnamed " + a.r.c, dir: compass(a.h) + "bound", clear: a.clear, veh: v, kmh: s, sec: s ? a.clear / (s / 3.6) : null, rec }; }).sort((p, q) => (q.veh ?? -1) - (p.veh ?? -1));
+  const wv = ap.filter(a => a.veh != null), veh = wv.reduce((s, a) => s + a.veh, 0), sec = wv.length ? wv.reduce((s, a) => s + (a.sec ?? 0) * a.veh, 0) / Math.max(veh, 1) : null;
+  const P = M.pop; let pop = 0; const c0 = Math.floor((b.lon - P.lon0) / P.dlon), r0 = Math.floor((b.lat - P.lat0) / P.dlat);
+  for (let r = r0 - 11; r <= r0 + 11; r++) for (let c = c0 - 13; c <= c0 + 13; c++) { if (r < 0 || c < 0 || r >= P.h || c >= P.w) continue; const [x, y] = toXY(P.lon0 + (c + .5) * P.dlon, P.lat0 + (r + .5) * P.dlat, o); if (x * x + y * y <= 1e6) pop += P.v[r * P.w + c]; }
+  const places = {}; for (const [lon, lat, cat] of M.poi) { const [x, y] = toXY(lon, lat, o); if (x * x + y * y <= 250000) places[cat] = (places[cat] || 0) + 1; }
+  return { ap, veh, sec, pop, places, pts, nv: wv.length };
+}
+
+// ---------- panel ----------
+function topRoads() {
+  const rows = []; for (const r of M.roads) for (const [d, rec] of Object.entries(r.d)) { const v = volume(rec); if (v != null && r.nm) rows.push({ r, d: +d, v }); }
+  rows.sort((a, b) => b.v - a.v); const seen = new Set(), top = [];
+  for (const x of rows) { if (seen.has(x.r.nm)) continue; seen.add(x.r.nm); top.push(x); if (top.length === 7) break; } return top;
+}
+function midOf(r, d) { const g = r.g, k = Math.floor((g.length - 1) / 2), k2 = Math.min(k + 1, g.length - 1); const hd = bearing((g[k2][0] - g[k][0]) * KX, (g[k2][1] - g[k][1]) * KY); return { lon: (g[k][0] + g[k2][0]) / 2, lat: (g[k][1] + g[k2][1]) / 2, h: d === 1 ? hd : (hd + 180) % 360 }; }
+function renderHome() {
+  if (!st.bands.length) { $("#pane").innerHTML = `<div class="empty"><span>Pick at least one time of day.</span></div>`; return; }
+  const top = topRoads(), mx = top[0]?.v || 1;
+  $("#pane").innerHTML = `<p class="prompt">Click any road to test a board there.</p>
+    <p class="h">Busiest roads</p>
+    <ol class="top">${top.map((x, i) => `<li><button type="button" data-i="${i}"><span><span class="nm">${esc(x.r.nm)}</span><span class="dir">${compass(midOf(x.r, x.d).h)}bound</span></span><span class="bar"><i style="width:${100 * x.v / mx}%"></i></span></button></li>`).join("")}</ol>
+    <p class="muted">Ranked by weekday traffic, one direction.</p>
+    ${aboutHTML()}`;
+  $("#pane").querySelectorAll("ol.top button").forEach(btn => btn.addEventListener("click", () => { const x = top[+btn.dataset.i], m = midOf(x.r, x.d); place(m.lon, m.lat, (m.h + 180) % 360, x.r); }));
+}
+function aboutHTML() {
+  const m = M.meta;
+  return `<details class="about"><summary>Where the numbers come from</summary><ol>
+    <li>Roads, ${m.osm.buildings.toLocaleString()} buildings and ${m.osm.poi.toLocaleString()} places: OpenStreetMap, Oct 2026.</li>
+    <li>Traffic and speed: ${(m.tariak.matched / 1e6).toFixed(2)}M weekday Tari'ak GPS points, 2015–19. Traffic is shown as a rank among measured roads, not vehicle counts.</li>
+    <li>Residents: WorldPop 2025, 100 m grid.</li>
+    <li>Assumed: the app logs positions at a steady interval, and its users are the same share of drivers everywhere. Building heights are mostly unknown.</li></ol></details>`;
+}
+function speedChart(rec) {
+  const p = rec.p, ff = rec.ff; if (!ff || p.filter(v => v != null).length < 6) return "";
+  const W = 340, H = 104, l = 24, r = 4, t = 6, b = 18, xs = h => l + (h - 6) / 17 * (W - l - r), cw = (W - l - r) / 17;
+  const mx = Math.max(ff, ...p.filter(v => v != null)) * 1.08, ys = v => t + (1 - v / mx) * (H - t - b); const hot = []; let bars = "";
+  for (let h = 6; h <= 23; h++) { const v = p[h]; if (v == null) continue; const c = v / ff < .6; if (c) hot.push(h);
+    bars += `<rect x="${(xs(h) - cw * .34).toFixed(1)}" y="${ys(v).toFixed(1)}" width="${(cw * .68).toFixed(1)}" height="${(ys(0) - ys(v)).toFixed(1)}" rx="1.5" fill="${c ? "var(--red)" : "var(--ink3)"}" opacity="${c ? .9 : .5}"${h === st.hour && st.mode === "speed" ? ' stroke="var(--ink)" stroke-width="1.5"' : ""}/>`; }
+  const ht = hot.length ? (() => { const o = []; let s = hot[0], q = hot[0]; for (let i = 1; i <= hot.length; i++) { if (hot[i] === q + 1) { q = hot[i]; continue; } o.push(s === q ? `${s}h` : `${s}–${q + 1}h`); s = q = hot[i]; } return o.join(", "); })() : "";
+  return `<div><p class="h">${ht ? "Congested " + ht : "Flows freely all day"}</p><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Measured weekday speed by hour">${bars}
+    <line x1="${l}" x2="${W - r}" y1="${ys(ff)}" y2="${ys(ff)}" stroke="var(--ink)" stroke-dasharray="2 3"/><text x="${l - 4}" y="${ys(ff) + 3}" text-anchor="end" font-size="10" fill="var(--ink2)">${ff}</text>
+    <line x1="${l}" x2="${W - r}" y1="${ys(0)}" y2="${ys(0)}" stroke="var(--line)"/>${[6, 12, 18, 23].map(h => `<text x="${xs(h)}" y="${H - 3}" text-anchor="middle" font-size="10" fill="var(--ink3)">${h}h</text>`).join("")}</svg>
+    <p class="muted">Median speed by hour (km/h). Red: below 60% of free flow.</p></div>`;
+}
+function placesChart(pl) {
+  const rows = Object.entries(pl).sort((a, b) => b[1] - a[1]).slice(0, 6); if (!rows.length) return `<p class="muted">No mapped places within 500 m.</p>`;
+  const W = 340, rh = 21, l = 128, mx = rows[0][1], xs = v => l + v / mx * (W - l - 28);
+  return `<svg class="chart" viewBox="0 0 ${W} ${rows.length * rh}" role="img" aria-label="Mapped places within 500 metres">${rows.map(([c, n], i) => `<text x="0" y="${i * rh + 14}" font-size="11" fill="var(--ink2)">${CAT[c] || c}</text><rect x="${l}" y="${i * rh + 5}" width="${Math.max(2, xs(n) - l)}" height="11" rx="5.5" fill="var(--accent)" opacity=".85"/><text x="${xs(n) + 4}" y="${i * rh + 14}" font-size="10" fill="var(--ink3)">${n}</text>`).join("")}</svg>`;
+}
+function renderBoard() {
+  if (!board) { renderHome(); drawBoard(); return; }
+  if (!st.bands.length) { $("#pane").innerHTML = `<div class="empty"><span>Pick at least one time of day.</span></div>`; return; }
+  const res = board.res = evaluate(board), a0 = res.ap[0]; drawBoard();
+  $("#pane").innerHTML = `<button type="button" class="back" id="clear">← Busiest roads</button>
+    <div><p class="title">${esc(board.road || "Board")}</p><p class="sub">Facing ${compass(board.face)} · readable to ${st.dist} m</p></div>
+    <div class="ctrl" role="group" aria-label="Board settings"><button type="button" id="rl" aria-label="Turn left 15 degrees">↺ 15°</button><button type="button" id="rr" aria-label="Turn right 15 degrees">↻ 15°</button><button type="button" id="fl">Flip</button></div>
+    <div class="big3"><div class="tr"><b>${res.nv ? "Top " + Math.max(1, 100 - pctRoad(res.veh)) + "%" : "–"}</b><span>traffic rank</span></div><div><b>${res.sec != null ? res.sec.toFixed(1) + " s" : "–"}</b><span>in view each</span></div><div><b>${N(res.pop)}</b><span>live within 1 km</span></div></div>
+    ${res.ap.length ? `<div><p class="h">Seen from ${res.ap.length === 1 ? "one road" : res.ap.length + " road directions"}</p><table><thead><tr><th>Road</th><th class="r">Clear view</th><th class="r">Busier than</th></tr></thead><tbody>
+      ${res.ap.slice(0, 5).map(a => `<tr><td>${esc(a.name)}<br><span class="muted">${a.dir}${a.kmh ? ", " + Math.round(a.kmh) + " km/h" : ""}</span></td><td class="r">${Math.round(a.clear)} m</td><td class="r">${a.veh != null ? pctDir(a.veh) + "%" : "no data"}</td></tr>`).join("")}</tbody></table></div>`
+      : `<p class="muted">No road sees the face within ${st.dist} m. Turn the board or move it.</p>`}
+    ${a0 && a0.rec ? speedChart(a0.rec) : ""}
+    <div><p class="h">Within 500 m</p>${placesChart(res.places)}</div>
+    <p class="muted"><svg width="8" height="8" aria-hidden="true"><circle cx="4" cy="4" r="4" fill="var(--accent)"/></svg> clear view &nbsp; <svg width="8" height="8" aria-hidden="true"><circle cx="4" cy="4" r="3" fill="var(--red)"/></svg> building in the way &nbsp; dashed ring: 1 km</p>`;
+  $("#clear").addEventListener("click", () => { board = null; renderBoard(); });
+  $("#rl").addEventListener("click", () => { board.face = (board.face + 345) % 360; renderBoard(); });
+  $("#rr").addEventListener("click", () => { board.face = (board.face + 15) % 360; renderBoard(); });
+  $("#fl").addEventListener("click", () => { board.face = (board.face + 180) % 360; renderBoard(); });
+  say(res.nv ? `Top ${Math.max(1, 100 - pctRoad(res.veh))}% of measured roads for traffic.` : "No measured traffic sees this board.");
+}
+function place(lon, lat, face, road) {
+  board = { lon, lat, face, road: road ? (road.nm || "Unnamed " + road.c) : null }; renderBoard();
+  map.easeTo({ center: [lon, lat], zoom: Math.max(map.getZoom(), 17), pitch: Math.max(map.getPitch(), 50), bearing: ((face ?? 0) + 150) % 360, duration: reduce() ? 0 : 700 });
+}
+
+// ---------- map data ----------
+function buildRoads() {
+  const feats = M.roads.map(r => { const p = { id: r.id, nm: r.nm || "", c: r.c, data: Object.keys(r.d).length ? 1 : 0 };
+    for (let b = 0; b < 4; b++) { const vs = Object.values(r.d).map(d => d.v[b]).filter(v => v != null); p["v" + b] = vs.length ? vs.reduce((a, c) => a + c, 0) : -1; }
+    for (let h = 6; h < 24; h++) { const rs = Object.values(r.d).filter(d => d.ff && d.p[h] != null).map(d => d.p[h] / d.ff); p["h" + h] = rs.length ? Math.min(...rs) : -1; }
+    return { type: "Feature", properties: p, geometry: { type: "LineString", coordinates: r.g } }; });
+  return { type: "FeatureCollection", features: feats };
+}
+function buildBuildings() {
+  const B = G.bld, feats = [];
+  for (const f of B.b) { const h = f[0]; let x = f[1], y = f[2]; const ring = [[B.W + x / B.q, B.S + y / B.q]];
+    for (let i = 3; i < f.length; i += 2) { x += f[i]; y += f[i + 1]; ring.push([B.W + x / B.q, B.S + y / B.q]); } ring.push(ring[0]);
+    feats.push({ type: "Feature", properties: { h: h >= 0 ? h : 7, known: h >= 0 ? 1 : 0 }, geometry: { type: "Polygon", coordinates: [ring] } }); }
+  return { type: "FeatureCollection", features: feats };
+}
+// zoom must stay at the top of the expression, so multipliers go inside each stop
+const STOPS = [[11, [1.6, 1, .6, .5]], [15, [8, 6, 4, 2.5]], [18, [26, 18, 12, 10]]];
+const cls = v => ["match", ["get", "c"], ["motorway", "trunk", "motorway_link", "trunk_link"], v[0], ["primary", "secondary", "primary_link", "secondary_link"], v[1], ["tertiary", "tertiary_link"], v[2], v[3]];
+const wroad = (mult = 1, add = 0) => ["interpolate", ["linear"], ["zoom"], ...STOPS.flatMap(([z, v]) => [z, ["+", ["*", cls(v), mult], add]])];
+const W_ROAD = wroad();
+function bandExpr() { const parts = st.bands.map(b => ["*", ["get", "v" + b], BANDS[b][2]]); return parts.length ? (parts.length === 1 ? parts[0] : ["+", ...parts]) : 0; }
+function bandOK() { return ["all", ...st.bands.map(b => [">=", ["get", "v" + b], 0])]; }
+let CAP = 60000;
+function trafficPaint() {
+  const vals = []; for (const r of M.roads) { let s = 0, ok = Object.keys(r.d).length > 0; for (const b of st.bands) { const vs = Object.values(r.d).map(d => d.v[b]); if (vs.every(v => v == null)) { ok = false; break; } s += vs.filter(v => v != null).reduce((a, c) => a + c, 0) * BANDS[b][2]; } if (ok) vals.push(s); }
+  vals.sort((a, b) => a - b); CAP = vals[Math.floor(vals.length * .98)] || 1;
+  map.setFilter("traffic", ["all", ["==", ["get", "data"], 1], bandOK()]);
+  map.setPaintProperty("traffic", "line-color", ["interpolate", ["linear"], ["sqrt", ["min", 1, ["max", 0, ["/", bandExpr(), CAP]]]], 0, css("--t0"), 1, css("--t1")]);
+  map.setPaintProperty("traffic", "line-width", wroad(["+", .6, ["*", .9, ["sqrt", ["min", 1, ["max", 0, ["/", bandExpr(), CAP]]]]]]));
+}
+function speedPaint() {
+  const k = "h" + st.hour;
+  map.setFilter("speedl", [">=", ["get", k], 0]);
+  map.setPaintProperty("speedl", "line-color", ["interpolate", ["linear"], ["get", k], .3, css("--red"), .6, "#ff9f0a", .85, css("--accent")]);
+}
+function setKey() {
+  const k = $("#key");
+  if (st.mode === "traffic") k.innerHTML = `<span>quieter</span><span class="ramp" style="background:linear-gradient(90deg,var(--t0),var(--t1))"></span><span>busier</span>`;
+  else if (st.mode === "speed") k.innerHTML = `<span>jammed</span><span class="ramp" style="background:linear-gradient(90deg,var(--red),#ff9f0a,var(--accent))"></span><span>free flow</span>`;
+  else if (st.mode === "people") k.innerHTML = `<span>few</span><span class="ramp" style="background:linear-gradient(90deg,#d6e6fb,#0a3f94)"></span><span>${G.popcap}+ per 100 m</span>`;
+  else k.innerHTML = `<span>${M.poi.length.toLocaleString()} shops, offices, schools, clinics and more (OSM)</span>`;
+}
+function setMode(m) {
+  st.mode = m; document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === m));
+  $("#c-traffic").hidden = m !== "traffic"; $("#c-speed").hidden = m !== "speed";
+  const vis = (id, on) => map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+  vis("traffic", m === "traffic"); vis("nodata", m === "traffic" || m === "speed"); vis("speedl", m === "speed"); vis("pop", m === "people"); vis("places", m === "places");
+  if (m !== "speed") stopPlay(); setKey(); if (board) renderBoard();
+}
+function stopPlay() { clearInterval(timer); timer = null; $("#play").textContent = "▶"; $("#play").setAttribute("aria-label", "Play through the day"); }
+function setHour(h) { st.hour = h; $("#hr").value = h; $("#hr-v").textContent = h + ":00"; speedPaint(); }
+
+function drawBoard() {
+  const src = map.getSource("board"), vs = map.getSource("view"), cs = map.getSource("ring"); if (!src) return;
+  if (!board) { [src, vs, cs, map.getSource("bb3d")].forEach(s => s && s.setData({ type: "FeatureCollection", features: [] })); return; }
+  const tip = [board.lon + Math.sin(board.face * Math.PI / 180) * 40 / KX, board.lat + Math.cos(board.face * Math.PI / 180) * 40 / KY];
+  src.setData({ type: "FeatureCollection", features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [board.lon, board.lat] } }, { type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [[board.lon, board.lat], tip] } }] });
+  vs.setData({ type: "FeatureCollection", features: board.res.pts.map(([lon, lat, c]) => ({ type: "Feature", properties: { c }, geometry: { type: "Point", coordinates: [lon, lat] } })) });
+  const ring = []; for (let i = 0; i <= 64; i++) { const a = i / 64 * 2 * Math.PI; ring.push([board.lon + Math.sin(a) * 1000 / KX, board.lat + Math.cos(a) * 1000 / KY]); }
+  cs.setData({ type: "FeatureCollection", features: [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: ring } }] });
+  // small 3D billboard: pole plus a panel whose front (blue) faces board.face
+  const f = board.face * Math.PI / 180, ux = Math.sin(f), uy = Math.cos(f), rx = Math.cos(f), ry = -Math.sin(f);
+  const box = (w, d0, d1) => { const c = [[-w / 2, d0], [w / 2, d0], [w / 2, d1], [-w / 2, d1], [-w / 2, d0]].map(([a, d]) => [board.lon + (rx * a + ux * d) / KX, board.lat + (ry * a + uy * d) / KY]); return { type: "Polygon", coordinates: [c] }; };
+  const bb = (g, col, b, h) => ({ type: "Feature", properties: { col, b, h }, geometry: g });
+  map.getSource("bb3d").setData({ type: "FeatureCollection", features: [bb(box(2, -2.6, -0.6), "#3a3a3c", 0, 11), bb(box(27, -1.8, -0.6), "#3a3a3c", 9.5, 22), bb(box(24, -0.6, 0.6), "#ffffff", 10.5, 21)] });
+}
+function nearestRoad(lng, lat, maxd) {
+  const o = [lng, lat]; let best = null, bd = maxd;
+  for (const r of M.roads) { const g = r.g; for (let i = 0; i < g.length - 1; i++) { const [x0, y0] = toXY(g[i][0], g[i][1], o), [x1, y1] = toXY(g[i + 1][0], g[i + 1][1], o), dx = x1 - x0, dy = y1 - y0, L2 = dx * dx + dy * dy || 1, t = Math.max(0, Math.min(1, -(x0 * dx + y0 * dy) / L2)), d = Math.hypot(x0 + t * dx, y0 + t * dy); if (d < bd) { bd = d; best = { r, hd: bearing(dx, dy) }; } } }
+  return best;
+}
+function onClick(e) {
+  const best = nearestRoad(e.lngLat.lng, e.lngLat.lat, 60); if (!best) { say("Click closer to a road."); return; }
+  const ds = dirsOf(best.r); let dir = ds[0], v0 = -1; for (const d of ds) { const v = volume(best.r.d[String(d)]) ?? 0; if (v > v0) { v0 = v; dir = d; } }
+  const h = dir === 1 ? best.hd : (best.hd + 180) % 360; place(e.lngLat.lng, e.lngLat.lat, (h + 180) % 360, best.r);
+}
+function hoverText(p) {
+  const nm = p.nm || "Unnamed " + p.c;
+  if (st.mode === "speed") { const r = p["h" + st.hour]; return `<b>${esc(nm)}</b><br>${r >= 0 ? Math.round(r * 100) + "% of free-flow speed at " + st.hour + ":00" : "No speed data at this hour"}`; }
+  if (!p.data) return `<b>${esc(nm)}</b><br>No measurements`;
+  let s = 0, ok = true; for (const b of st.bands) { if (p["v" + b] < 0) ok = false; else s += p["v" + b] * BANDS[b][2]; }
+  return `<b>${esc(nm)}</b><br>${ok ? "Busier than " + pctRoad(s) + "% of measured roads" : "Too few measurements at these times"}<br><span style="color:var(--ink3)">Click to test a board here</span>`;
+}
+
+// ---------- search ----------
+function setupSearch() {
+  const items = []; const seen = new Set();
+  for (const l of G.labels) items.push({ t: l.n, k: "area", lon: l.lon, lat: l.lat });
+  for (const r of M.roads) if (r.nm && !seen.has(r.nm)) { seen.add(r.nm); const m = midOf(r, 1); items.push({ t: r.nm, k: "road", lon: m.lon, lat: m.lat }); }
+  const q = $("#q"), ul = $("#sugg");
+  const go = it => { ul.hidden = true; q.value = it.t; map.flyTo({ center: [it.lon, it.lat], zoom: it.k === "area" ? 15 : 16, duration: reduce() ? 0 : 1200 }); say("Moved to " + it.t); };
+  q.addEventListener("input", () => { const s = q.value.trim().toLowerCase(); if (s.length < 2) { ul.hidden = true; return; }
+    const hits = items.filter(i => i.t.toLowerCase().includes(s)).slice(0, 8);
+    ul.innerHTML = hits.length ? hits.map((h, i) => `<li><button type="button" data-i="${i}">${esc(h.t)}<small>${h.k}</small></button></li>`).join("") : `<li class="hint" style="padding:6px 10px">No match</li>`;
+    ul.hidden = false; ul.querySelectorAll("button").forEach(b => b.addEventListener("click", () => go(hits[+b.dataset.i]))); });
+  q.addEventListener("keydown", e => { if (e.key === "Enter") { const b = ul.querySelector("button"); if (b) b.click(); } if (e.key === "Escape") ul.hidden = true; });
+}
+
+// ---------- boot ----------
+async function boot() {
+  try { if (window.__D) { M = window.__D; G = window.__G; } else { const [a, b] = await Promise.all([fetch("data.json"), fetch("map.json")]); if (!a.ok || !b.ok) throw 0; M = await a.json(); G = await b.json(); } }
+  catch (e) { $("#pane").innerHTML = `<div class="empty"><span>The map data did not load.</span><button type="button" id="retry">Try again</button></div>`; $("#retry").addEventListener("click", () => location.reload()); return; }
+  if (!window.maplibregl) { $("#pane").innerHTML = `<div class="empty"><span>The map library did not load.</span><button type="button" id="retry">Try again</button></div>`; $("#retry").addEventListener("click", () => location.reload()); return; }
+  const mid = (M.meta.bbox[1] + M.meta.bbox[3]) / 2; KX = 111320 * Math.cos(mid * Math.PI / 180); KY = 110540;
+  const raw = atob(M.mask.b64), bits = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) bits[i] = raw.charCodeAt(i); mask = { ...M.mask, bits };
+  const [W, S, E, Nn] = M.meta.bbox;
+  map = new maplibregl.Map({ container: "map", style: { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": css("--land") } }] },
+    bounds: [[W + .01, S + .005], [E - .005, Nn - .003]], maxBounds: [[W - .06, S - .05], [E + .06, Nn + .05]], minZoom: 11, maxZoom: 19, pitch: 58, bearing: -20, attributionControl: false, dragRotate: true, pitchWithRotate: true, fadeDuration: 0 });
+  const pad = () => innerWidth > 1000 ? { left: 300, right: 400, top: 30, bottom: 30 } : { left: 10, right: 10, top: 10, bottom: 10 };
+  map.setPadding(pad()); map.fitBounds([[W + .01, S + .005], [E - .005, Nn - .003]], { duration: 0, pitch: 58, bearing: -20 });
+  addEventListener("resize", () => map.setPadding(pad()));
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
+  map.addControl(new maplibregl.ScaleControl({ maxWidth: 110, unit: "metric" }), "bottom-left");
+  map.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "© OpenStreetMap contributors · Tari'ak (ODbL) · WorldPop" }), "bottom-right");
+  map.on("load", () => {
+    map.addSource("sea", { type: "geojson", data: G.sea });
+    map.addSource("bld", { type: "geojson", data: buildBuildings() });
+    map.addSource("roads", { type: "geojson", data: buildRoads() });
+    map.addSource("pop", { type: "image", url: window.__P || "pop.png", coordinates: G.popbox });
+    map.addSource("places", { type: "geojson", data: { type: "FeatureCollection", features: M.poi.map(([lon, lat, c]) => ({ type: "Feature", properties: { c, n: CAT[c] || c }, geometry: { type: "Point", coordinates: [lon, lat] } })) } });
+    ["board", "view", "ring"].forEach(s => map.addSource(s, { type: "geojson", data: { type: "FeatureCollection", features: [] } }));
+    map.addLayer({ id: "sea", type: "fill", source: "sea", paint: { "fill-color": css("--sea") } });
+    map.addSource("esri", { type: "raster", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize: 256, maxzoom: 19 });
+    map.addLayer({ id: "esri", type: "raster", source: "esri", layout: { visibility: "none" } });
+    map.addLayer({ id: "pop", type: "raster", source: "pop", layout: { visibility: "none" }, paint: { "raster-opacity": .85, "raster-resampling": "nearest" } });
+    map.addLayer({ id: "bld2", type: "fill", source: "bld", minzoom: 13, paint: { "fill-color": css("--bld"), "fill-opacity": ["interpolate", ["linear"], ["zoom"], 13, .4, 15, .9] } });
+    map.addLayer({ id: "bld3", type: "fill-extrusion", source: "bld", minzoom: 14, layout: { visibility: "none" }, paint: { "fill-extrusion-color": ["case", ["==", ["get", "known"], 1], css("--bld3"), css("--bld")], "fill-extrusion-height": ["get", "h"], "fill-extrusion-opacity": .85 } });
+    map.setLayoutProperty("bld3", "visibility", st.d3 ? "visible" : "none"); map.setLayoutProperty("bld2", "visibility", st.d3 ? "none" : "visible");
+    map.addLayer({ id: "casing", type: "line", source: "roads", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": css("--roadc"), "line-width": wroad(1, 1.5) } });
+    map.addLayer({ id: "base", type: "line", source: "roads", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": css("--road"), "line-width": W_ROAD } });
+    map.addLayer({ id: "nodata", type: "line", source: "roads", filter: ["==", ["get", "data"], 0], paint: { "line-color": css("--nodata"), "line-width": wroad(.5), "line-dasharray": [2, 2] } });
+    map.addLayer({ id: "traffic", type: "line", source: "roads", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-width": W_ROAD } });
+    map.addLayer({ id: "speedl", type: "line", source: "roads", layout: { visibility: "none", "line-join": "round", "line-cap": "round" }, paint: { "line-width": wroad(.9) } });
+    map.addLayer({ id: "places", type: "circle", source: "places", layout: { visibility: "none" }, paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 12, 1.5, 17, 5], "circle-color": css("--ink"), "circle-opacity": .75, "circle-stroke-color": css("--surface"), "circle-stroke-width": .8 } });
+    map.addLayer({ id: "ring", type: "line", source: "ring", paint: { "line-color": css("--ink2"), "line-width": 1.2, "line-dasharray": [3, 3] } });
+    map.addLayer({ id: "view", type: "circle", source: "view", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 14, 2, 18, 5], "circle-color": ["case", ["==", ["get", "c"], 1], "#9cc4fa", css("--red")], "circle-stroke-color": "#ffffff", "circle-stroke-width": 1 } });
+    map.addSource("bb3d", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    map.addLayer({ id: "bb3d", type: "fill-extrusion", source: "bb3d", paint: { "fill-extrusion-color": ["get", "col"], "fill-extrusion-base": ["get", "b"], "fill-extrusion-height": ["get", "h"], "fill-extrusion-opacity": 1 } });
+    map.addLayer({ id: "board-line", type: "line", source: "board", filter: ["==", ["geometry-type"], "LineString"], paint: { "line-color": css("--accent"), "line-width": 3.5 } });
+    map.addLayer({ id: "board-pt", type: "circle", source: "board", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 5, "circle-color": css("--accent"), "circle-stroke-color": css("--surface"), "circle-stroke-width": 2.5 } });
+    // area labels as DOM markers (no font server is reachable from this page)
+    for (const l of G.labels) { const el = document.createElement("div"); el.className = "lbl"; el.textContent = l.n; new maplibregl.Marker({ element: el }).setLngLat([l.lon, l.lat]).addTo(map); }
+    trafficPaint(); speedPaint(); setMode("traffic");
+    popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10, maxWidth: "240px" });
+    ["traffic", "speedl", "nodata"].forEach(id => {
+      map.on("mousemove", id, e => { map.getCanvas().style.cursor = "pointer"; popup.setLngLat(e.lngLat).setHTML(hoverText(e.features[0].properties)).addTo(map); });
+      map.on("mouseleave", id, () => { map.getCanvas().style.cursor = ""; popup.remove(); });
+    });
+    map.on("mousemove", "places", e => { popup.setLngLat(e.lngLat).setHTML(esc(e.features[0].properties.n)).addTo(map); });
+    map.on("mouseleave", "places", () => popup.remove());
+    map.on("click", onClick);
+    renderHome(); setupSearch();
+  });
+  // controls
+  $("#bands").innerHTML = BANDS.map((b, i) => `<button type="button" data-i="${i}" aria-pressed="true" title="${b[1]}">${b[0]}</button>`).join("");
+  $("#bands").querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+    btn.setAttribute("aria-pressed", btn.getAttribute("aria-pressed") !== "true"); st.bands = [...$("#bands").querySelectorAll('[aria-pressed="true"]')].map(z => +z.dataset.i);
+    if (st.bands.length) { trafficPaint(); setKey(); } renderBoard(); }));
+  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => setMode(b.dataset.m)));
+  $("#hr").addEventListener("input", e => { setHour(+e.target.value); if (board) renderBoard(); });
+  $("#play").addEventListener("click", () => { if (timer) return stopPlay(); $("#play").textContent = "❚❚"; $("#play").setAttribute("aria-label", "Pause");
+    timer = setInterval(() => setHour(st.hour >= 23 ? 6 : st.hour + 1), reduce() ? 1500 : 650); });
+  $("#t3d").addEventListener("click", e => { st.d3 = !st.d3; e.currentTarget.setAttribute("aria-pressed", st.d3);
+    map.setLayoutProperty("bld3", "visibility", st.d3 ? "visible" : "none"); map.setLayoutProperty("bld2", "visibility", st.d3 ? "none" : "visible");
+    map.easeTo({ pitch: st.d3 ? 58 : 0, bearing: st.d3 ? -20 : 0, zoom: st.d3 ? Math.max(map.getZoom(), 15.5) : map.getZoom(), duration: reduce() ? 0 : 900 }); });
+  $("#tsat").addEventListener("click", e => { st.sat = !st.sat; e.currentTarget.setAttribute("aria-pressed", st.sat);
+    map.setLayoutProperty("esri", "visibility", st.sat ? "visible" : "none"); map.setLayoutProperty("sea", "visibility", st.sat ? "none" : "visible"); });
+}
+boot();
+const intro = document.getElementById("intro"); intro.showModal(); document.getElementById("help").addEventListener("click", () => intro.showModal());
+</script>
